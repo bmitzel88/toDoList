@@ -39,9 +39,14 @@ document.addEventListener('DOMContentLoaded', () => {
         checkbox.type = 'checkbox';
         checkbox.checked = task.completed;
         checkbox.addEventListener('change', () => {
-            task.completed = checkbox.checked;
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            li.classList.toggle('completed', task.completed);
+            if (checkbox.checked) {
+                const index = tasks.indexOf(task);
+                if (index > -1) {
+                    tasks.splice(index, 1);
+                    localStorage.setItem('tasks', JSON.stringify(tasks));
+                    li.remove();
+                }
+            }
         });
 
         const span = document.createElement('span');
@@ -49,10 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         li.appendChild(checkbox);
         li.appendChild(span);
-
-        if (task.completed) {
-            li.classList.add('completed');
-        }
 
         list.appendChild(li);
     }
