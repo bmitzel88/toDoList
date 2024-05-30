@@ -9,8 +9,6 @@ class ToDo {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('todo-form') as HTMLFormElement;
-    const input = document.getElementById('todo-input') as HTMLInputElement;
     const list = document.getElementById('todo-list') as HTMLUListElement;
 
     // Load tasks from local storage
@@ -18,35 +16,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tasks.forEach(task => addTaskToDOM(task));
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
+    document.getElementById('open-modal-btn')!.addEventListener('click', function() {
+        const myModal = new bootstrap.Modal(document.getElementById('todoModal')!, {
+            keyboard: false
+        });
+        myModal.show();
+    });
+
+    document.getElementById('save-task-btn')!.addEventListener('click', function() {
+        const input = document.getElementById('task-input') as HTMLInputElement;
         const taskText = input.value.trim();
         if (taskText === '') return;
 
         const task = new ToDo(taskText);
-
         tasks.push(task);
         localStorage.setItem('tasks', JSON.stringify(tasks));
         addTaskToDOM(task);
         input.value = '';
+
+        const modalElement = document.getElementById('todoModal')!;
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        modalInstance.hide();
     });
 
     function addTaskToDOM(task: ToDo) {
         const li = document.createElement('li');
-        li.className = 'task-item';
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.checked = task.completed;
+        checkbox.className = 'form-check-input me-2';
         checkbox.addEventListener('change', () => {
-            if (checkbox.checked) {
-                const index = tasks.indexOf(task);
-                if (index > -1) {
-                    tasks.splice(index, 1);
-                    localStorage.setItem('tasks', JSON.stringify(tasks));
-                    li.remove();
-                }
-            }
+            task.completed = checkbox.checked;
+            localStorage.setItem('tasks', JSON.stringify(tasks));
         });
 
         const span = document.createElement('span');
